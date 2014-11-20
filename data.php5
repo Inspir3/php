@@ -1,6 +1,6 @@
 <?php
 
-require_once "json.php5";			//La fonction json_encode() ne fonctionne pas chez free, cette lib défini la fonction __json_encode()
+require_once "lib/json.php5";			//La fonction json_encode() ne fonctionne pas chez free, cette lib défini la fonction __json_encode()
 
 /*
 * La fonction http_response_code() ne fonctionne pas chez free,
