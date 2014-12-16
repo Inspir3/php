@@ -4,16 +4,16 @@
  * La fonction json_encode() ne fonctionne pas chez free (ancienne version de php)
  * Récupérer sur http://php.net/manual/en/function.json-encode.php#100835
  */
-function __json_encode( $data ) {            
+function json_encode( $data ) {            
     if( is_array($data) || is_object($data) ) { 
         $islist = is_array($data) && ( empty($data) || array_keys($data) === range(0,count($data)-1) ); 
         
         if( $islist ) { 
-            $json = '[' . implode(',', array_map('__json_encode', $data) ) . ']'; 
+            $json = '[' . implode(',', array_map('json_encode', $data) ) . ']'; 
         } else { 
             $items = Array(); 
             foreach( $data as $key => $value ) { 
-                $items[] = __json_encode("$key") . ':' . __json_encode($value); 
+                $items[] = json_encode("$key") . ':' . json_encode($value); 
             } 
             $json = '{' . implode(',', $items) . '}'; 
         } 
