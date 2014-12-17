@@ -73,26 +73,150 @@ if (!file_exists($repertoire)) {
 	mkdir($repertoire);								//Créé le répertoire de l'application si il n'existe pas (dans data/<application>/)
 }
 
+$chemin = $repertoire . $FICHIER . ".txt";
+
+/*
+ * Charge le fichier de données JSON
+ */
+function charge(){
+	global $chemin;
+	global $log;
+	
+	$log->debug("charge()");
+	
+	$contenu = "";
+		
+	if (file_exists($chemin)){
+		$contenu = file_get_contents($chemin);
+	}
+	
+	return $contenu;
+}
+
+/*
+ * Retourne un ID disponible dans la liste JSON
+ */
+function ID_disponible($Liste){
+  global $log;
+  
+  $log->debug("ID_disponible()");
+  
+	$ret = 0;
+
+	foreach($Liste as $obj){
+		if ($obj->id > $ret) $ret = $obj->id;
+	}
+	
+	$ret++;
+	
+	$log->debug("ID_disponible() -> $ret");
+	
+	return $ret;
+}
+
+/*
+ * Supprime un objet de la liste, retourne la nouvelle liste
+ */
+function modification($Liste, $Obj){
+  global $log;
+  
+  $log->debug("modification()");
+  
+	$ret = [];
+	
+	$inconnu = true;
+
+	foreach($Liste as $obj){	
+		if ($obj->id == $Obj->id){
+			array_push($ret, $Obj);
+			$inconnu = false;
+		}else{
+			array_push($ret, $obj);
+		}	
+	}
+	
+	if ($inconnu){												//Si l'objet n'existe pas
+		$Obj->id = ID_disponible($Liste);		//On lui affecte un id disponible
+		array_push($ret, $Obj);   					//et on l'ajoute à la fin de la liste
+	} 
+		
+	return $ret;
+}
+
+/*
+ * Supprime un objet de la liste, retourne la nouvelle liste
+ */
+function suppression($Liste, $Obj){
+  global $log;
+  
+  $log->debug("suppression()");
+  
+	$ret = [];
+
+	foreach($Liste as $obj){	
+		if ($obj->id != $Obj->id) array_push($ret, $obj);	
+	}
+		
+	return $ret;
+}
+
 switch(strtolower($ACTION)){
 
-	case "charger":
-
-		$contenu = "";
-		$chemin = $repertoire . $FICHIER . ".txt";
-	
-		if (file_exists($chemin)){
-			$contenu = file_get_contents($chemin);
-		}
-		
-		retourneJSON($contenu);
-	
+	case "chargement":
+		retourneJSON(charge());	
 	break;
 
-	case "sauvegarder":
+	case "sauvegarde":
+		
+		if ($DONNEES == "") retourneErreur("Veuillez renseigner le paramètre donnees");
+						
+		file_put_contents($chemin, $DONNEES);  	
+		retourneJSON("ok");
+	break;
+	
+	case "ajout":
 		
 		if ($DONNEES == "") retourneErreur("Veuillez renseigner le paramètre donnees");
 		
-		file_put_contents($repertoire . $FICHIER . ".txt", $DONNEES);  	
+		$liste = json_decode(charge());						
+		if ($liste == "") $liste = [];        	//Si la structure JSON n'existe pas encore, on la créé
+		
+		$obj = json_decode($DONNEES);						//On recupere l'objet à ajouter
+		$obj->id = ID_disponible($liste);				//et on lui affecte un id disponible
+		
+		array_push($liste, $obj);		
+				
+		file_put_contents($chemin, json_encode($liste));  	
+		retourneJSON("ok");
+	break;
+	
+	case "modification":
+		
+		if ($DONNEES == "") retourneErreur("Veuillez renseigner le paramètre donnees");
+		
+		$liste = json_decode(charge());						
+		if ($liste == "") $liste = [];        	//Si la structure JSON n'existe pas encore, on la créé
+		
+		$obj = json_decode($DONNEES);						//On recupere l'objet à modifier
+		
+		$liste = modification($liste, $obj);
+						
+		file_put_contents($chemin, json_encode($liste));  	
+		retourneJSON("ok");
+	break;
+	
+	case "suppression":
+		
+		if ($DONNEES == "") retourneErreur("Veuillez renseigner le paramètre donnees");
+		
+		$liste = json_decode(charge());						
+		if ($liste == "") $liste = [];        	//Si la structure JSON n'existe pas encore, on la créé
+		
+		$obj = json_decode($DONNEES);						//On recupere l'objet à supprimer
+		
+		$liste = suppression($liste, $obj);     
+						
+		file_put_contents($chemin, json_encode($liste));  	
 		retourneJSON("ok");
 	break;
 }
