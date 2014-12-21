@@ -122,7 +122,7 @@ function modification($Liste, $Obj){
   
   $log->debug("modification()");
   
-	$ret = [];
+	$ret = array();
 	
 	$inconnu = true;
 
@@ -151,7 +151,7 @@ function suppression($Liste, $Obj){
   
   $log->debug("suppression()");
   
-	$ret = [];
+	$ret = array();
 
 	foreach($Liste as $obj){	
 		if ($obj->id != $Obj->id) array_push($ret, $obj);	
@@ -179,7 +179,7 @@ switch(strtolower($ACTION)){
 		if ($DONNEES == "") retourneErreur("Veuillez renseigner le paramètre donnees");
 		
 		$liste = json_decode(charge());						
-		if ($liste == "") $liste = [];        	//Si la structure JSON n'existe pas encore, on la créé
+		if ($liste == "") $liste = array();        	//Si la structure JSON n'existe pas encore, on la créé
 		
 		$obj = json_decode($DONNEES);						//On recupere l'objet à ajouter
 		$obj->id = ID_disponible($liste);				//et on lui affecte un id disponible
@@ -195,7 +195,7 @@ switch(strtolower($ACTION)){
 		if ($DONNEES == "") retourneErreur("Veuillez renseigner le paramètre donnees");
 		
 		$liste = json_decode(charge());						
-		if ($liste == "") $liste = [];        	//Si la structure JSON n'existe pas encore, on la créé
+		if ($liste == "") $liste = array();        	//Si la structure JSON n'existe pas encore, on la créé
 		
 		$obj = json_decode($DONNEES);						//On recupere l'objet à modifier
 		
@@ -210,7 +210,7 @@ switch(strtolower($ACTION)){
 		if ($DONNEES == "") retourneErreur("Veuillez renseigner le paramètre donnees");
 		
 		$liste = json_decode(charge());						
-		if ($liste == "") $liste = [];        	//Si la structure JSON n'existe pas encore, on la créé
+		if ($liste == "") $liste = array();        	//Si la structure JSON n'existe pas encore, on la créé
 		
 		$obj = json_decode($DONNEES);						//On recupere l'objet à supprimer
 		
